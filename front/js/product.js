@@ -10,7 +10,7 @@ Ce fichier .js permet de charger puis afficher le produit sélectionné par son 
 
 const productId = new URLSearchParams(window.location.search).get("id");         /*On utilise URLSearchParams pour "parse" l'URL, et sélectionner le paramètre "id" */
 const productAPI = `http://localhost:3000/api/products/${productId}`;            /*On stocke l'url API du produit */
-let localStorageCart = JSON.parse(localStorage.getItem("Panier"))                /*Cherche dans le localStorage si il y a un item "Product" */
+let localStorageCart = JSON.parse(localStorage.getItem("Panier"))                /*Cherche dans le localStorage si il y a un item "Panier" */
 
 
 //-----------------------------------------------------//
@@ -74,7 +74,7 @@ function listeningOrder(product){
 
 /*####################-Gestion commmande-####################*/
 
-function addToCart(productOptions){    
+function addToCart(productOptions){                                            
     if (localStorageCart === null) {                                           /*Si localStorage vide */
         createNewCart(productOptions);        
     }

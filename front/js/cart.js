@@ -8,20 +8,21 @@ Ce fichier .js permet de charger puis afficher le panier enregistré dans LocalS
 //----------------Variables Globales------------------//
 //---------------------------------------------------//
 
-let savedCart = JSON.parse(localStorage.getItem("Panier"));                                 /*On récupère le panier dans le localStorage */
+let localCart = JSON.parse(localStorage.getItem("Panier"));                                 /*On récupère le panier dans le localStorage */
 let totalPrice = 0;                                                                         /*On crée des variables globales pour certaines fonctions */
 let totalQuantity = 0;                                                                      
 let IdsInCart = [];                                                                         /*On prépare une array pour enregistrer les ids produits */
 let orderBtn = document.querySelector(".cart__order__form__submit");                        /*On sélectionne le orderBtn pour plus tard*/
 let orderAPI = "http://localhost:3000/api/products/order";
 
+
 //-----------------------------------------------------//
 //----------------------Processus---------------------//
 //---------------------------------------------------//
 
-displayCart(savedCart);
+displayCart(localCart);
 setInputsAttributes();
-getIdsInCart(savedCart);
+getIdsInCart(localCart);
 listenOrderBtn();
 
 //-----------------------------------------------------//
@@ -34,6 +35,8 @@ listenOrderBtn();
 function displayCart(savedCart) {                                                           /*Affiche le panier à l'utilisateur */
     if (savedCart === null || savedCart.length == 0 ) {                                     /*Si le panier est vide */
         document.getElementById("cart__title").innerHTML = `Votre panier est vide`;         /*Affiche l'état du panier à l'utilisateur */
+        document.querySelector("#totalPrice").innerHTML = 0;                      
+        document.querySelector("#totalQuantity").innerHTML = 0;
     } else {                                                                                /*Si le panier contient un/des produits */
         fetchProductsAPI(savedCart);                                                        /*Appelle la fonction festchProductsAPI */
     }
@@ -78,8 +81,8 @@ function createDiv(element, jsonData){                                          
                             </div>
                         </article>
                     </article>`;
-    div.addEventListener('change', event => editQuantity(event, savedCart));                /*Ajout d'un eventListener "change" pour le div créé */
-    div.addEventListener('click', event => deleteProduct(event, savedCart))                 /*Ajout d'un eventListener "click" pour le div créé */
+    div.addEventListener('change', event => editQuantity(event, localCart));                /*Ajout d'un eventListener "change" pour le div créé */
+    div.addEventListener('click', event => deleteProduct(event, localCart))                 /*Ajout d'un eventListener "click" pour le div créé */
     document.querySelector("#cart__items").appendChild(div);                                /*On ajoute le div à la suite d'autres div dans l'élément "#cart__items" */
 }
 
@@ -106,7 +109,8 @@ function editQuantity(event, savedCart) {                                       
 function deleteProduct(event, savedCart) {                                                  /*Supprime un produit du panier */
     if(event.target.classList.contains('deleteItem') === true){                             /*Si l'utilisateur a cliqué sur le bouton "Supprimer" */
         let selectedItem = findItemToUpdate(event, savedCart);                              /*Récupère l'élement visé par l'utilisateur   */
-        updatedCart = savedCart.filter(item => item != selectedItem);                       /*On enregistre tous les éléments SAUF l'item sélectionné */
+        let updatedCart = savedCart.filter(item => item != selectedItem);                   /*On enregistre tous les éléments SAUF l'item sélectionné */
+        localCart = updatedCart;
         updateCart(updatedCart);                                                            /*On envoie le nouveau panier vers la fonction "updateCart" */
     }
 }
@@ -130,6 +134,8 @@ function updateCart(newCart) {                                                  
 function resetGlobalVariables(){                                                            /*Remet à 0 les variables globales */
     totalPrice = 0; 
     totalQuantity = 0; 
+    document.querySelector("#totalPrice").innerHTML = 0;                      
+    document.querySelector("#totalQuantity").innerHTML = 0;                
     IdsInCart = [];  
     document.querySelector("#cart__items").innerHTML = "";
 }

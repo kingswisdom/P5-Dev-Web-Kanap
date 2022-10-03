@@ -110,7 +110,6 @@ function deleteProduct(event, savedCart) {                                      
     if(event.target.classList.contains('deleteItem') === true){                             /*Si l'utilisateur a cliqué sur le bouton "Supprimer" */
         let selectedItem = findItemToUpdate(event, savedCart);                              /*Récupère l'élement visé par l'utilisateur   */
         let updatedCart = savedCart.filter(item => item != selectedItem);                   /*On enregistre tous les éléments SAUF l'item sélectionné */
-        localCart = updatedCart;
         updateCart(updatedCart);                                                            /*On envoie le nouveau panier vers la fonction "updateCart" */
     }
 }
@@ -132,6 +131,7 @@ function updateCart(newCart) {                                                  
 }
 
 function resetGlobalVariables(){                                                            /*Remet à 0 les variables globales */
+    localCart = JSON.parse(localStorage.getItem("Panier"));                                 /*On récupère le panier dans le localStorage */
     totalPrice = 0; 
     totalQuantity = 0; 
     document.querySelector("#totalPrice").innerHTML = 0;                      

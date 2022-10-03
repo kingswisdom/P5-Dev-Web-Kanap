@@ -19,8 +19,7 @@ let orderAPI = "http://localhost:3000/api/products/order";
 //----------------------Processus---------------------//
 //---------------------------------------------------//
 
-displayCart(savedCart);                                                                     /*Processus au lancement de la page */
-calculateDisplaySums(savedCart);
+displayCart(savedCart);
 setInputsAttributes();
 getIdsInCart(savedCart);
 listenOrderBtn();
@@ -46,7 +45,11 @@ function fetchProductsAPI(savedCart){                                           
             let productAPI = `http://localhost:3000/api/products/${element._id}`;           /*On prépare la requête vers api/products/id */
             fetch(productAPI)                                                               /*On requete l'API*/ 
                 .then( response => response.json())                                         /*Après réponse, traitement de la réponse avec JSON */
-                .then( jsonData => createDiv(element, jsonData))                            /*Après traitement, envoyer la réponse à la fonction "createDiv" */
+                .then( (jsonData) => {
+                    createDiv(element, jsonData)                                            /*Après traitement, envoyer la réponse à la fonction "createDiv" */
+                    storeApiPrices(element, jsonData)
+                })
+                .then(() => displaySums())                            
         };
 }
 
@@ -80,13 +83,12 @@ function createDiv(element, jsonData){                                          
     document.querySelector("#cart__items").appendChild(div);                                /*On ajoute le div à la suite d'autres div dans l'élément "#cart__items" */
 }
 
-function calculateDisplaySums(savedCart) {                                                  /*Calcule puis affiche les quantités produits et sommes de prix*/
-    for(let element of savedCart){                                                          /*Boucle pour chaque élément du panier*/
-        let priceSum = parseInt(element.price * element.quantity);                          /*On récupère le prix multiplié par la quantité pour chaque ligne */
-        let quantitySum = parseInt(element.quantity);                                       /*On récupère la quantité pour chaque ligne */
-        totalPrice += priceSum;                                                             /*On ajoute la somme des prix pour chaque ligne */
-        totalQuantity += quantitySum;                                                       /*Idem pour la quantité */
-    }
+function storeApiPrices(element, jsonData){
+    totalPrice += parseInt(jsonData.price * element.quantity);                              /*On récupère le prix multiplié par la quantité pour chaque ligne */
+    totalQuantity += parseInt(element.quantity);                                            /*On récupère la quantité pour chaque ligne */
+}
+
+function displaySums() {
     document.querySelector("#totalPrice").innerHTML = `${totalPrice}`;                      /*On ajoute au HTML le prix total du panier*/
     document.querySelector("#totalQuantity").innerHTML = `${totalQuantity}`;                /*On ajoute au HTML la quantité d'articles du panier */
 }
@@ -121,7 +123,6 @@ function findItemToUpdate(event, savedCart){                                    
 function updateCart(newCart) {                                                              /*Enregistre puis met à jour l'interface pour afficher le nouveau panier */
     localStorage.setItem("Panier", JSON.stringify(newCart));                                /*Enregistre le panier edité dans le localStorage */
     resetGlobalVariables();                                                                 /*Remet à 0 les variables globales */
-    calculateDisplaySums(JSON.parse(localStorage.getItem("Panier")));                       /*Calcule puis affiche les nouveaux totaux */
     displayCart(JSON.parse(localStorage.getItem("Panier")))                                 /* */
     getIdsInCart(JSON.parse(localStorage.getItem("Panier")))
 }
